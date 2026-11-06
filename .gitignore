@@ -1,0 +1,5 @@
+/tunecord
+/dist/
+/.smoke/
+*.test
+*.out

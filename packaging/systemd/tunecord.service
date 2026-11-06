@@ -1,0 +1,24 @@
+# Reference copy of the unit written by `tunecord install --user`.
+#
+# `tunecord install --user` generates this file at
+# ~/.config/systemd/user/tunecord.service with ExecStart set to the absolute,
+# symlink-resolved path of the binary. To install it by hand instead, copy it
+# there, adjust ExecStart if the binary is not in ~/.local/bin (%h expands to
+# your home directory), then run:
+#
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now tunecord.service
+[Unit]
+Description=tunecord (MPRIS to Discord Rich Presence)
+Documentation=https://github.com/cmerk2021/tunecore
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/tunecord run
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
