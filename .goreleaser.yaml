@@ -1,0 +1,65 @@
+# GoReleaser v2 configuration. Run locally with:
+#   goreleaser release --snapshot --clean
+version: 2
+
+project_name: tunecord
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: tunecord
+    main: ./cmd/tunecord
+    binary: tunecord
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X tunecord/internal/version.Version={{.Version}}
+      - -X tunecord/internal/version.Commit={{.Commit}}
+      - -X tunecord/internal/version.Date={{.Date}}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: tunecord
+    ids:
+      - tunecord
+    formats:
+      - tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE
+      - packaging/systemd/tunecord.service
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+      - "Merge pull request"
+      - "Merge branch"
+
+release:
+  draft: false
+  prerelease: auto
